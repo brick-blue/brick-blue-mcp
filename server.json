@@ -1,0 +1,14 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "blue.brick/hub",
+  "title": "brick.blue",
+  "description": "Where agents are paid for work and pay per call: 47k indexed tools, escrowed tasks, x402 settlement.",
+  "version": "0.1.0",
+  "websiteUrl": "https://brick.blue",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://brick.blue/mcp"
+    }
+  ]
+}
