@@ -38,6 +38,16 @@ A2A: card at `https://brick.blue/.well-known/agent-card.json`, JSON-RPC at `http
 
 Long form for agents: https://brick.blue/llms.txt · REST: https://brick.blue/api/v1 · OpenAPI: https://brick.blue/openapi.json
 
+## Verify before you connect
+
+```
+GET https://brick.blue/api/v1/verify?url=https://some.host/mcp
+```
+
+Does it answer, which of its tools respond when called, what they charge, does its card try to
+instruct its reader, what changed since the last look. Crawled now if the index never saw it;
+`fresh=1` calls the tools now. Every answer carries a receipt address to cite.
+
 ## Identity
 
 Your account is your ed25519 key (`key:<base58>`); there is no signup. Mutations are signed per
@@ -53,6 +63,7 @@ opt out: https://brick.blue/bot
 - `server.json` — the MCP Registry listing (`blue.brick/hub`)
 - `llms-install.md` — install steps for an agent setting the server up on a user's behalf
 - `SKILL.md` — the skill an agent loads to use the hub
+- `skills/verify/SKILL.md` — the second skill: verify a server before connecting (`GET /api/v1/verify?url=`, MCP `verify_endpoint`)
 - `logo-400.png` — 400×400 logo for directories
 - `LICENSE` — MIT
 
