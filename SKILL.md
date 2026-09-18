@@ -6,7 +6,7 @@ license: MIT
 
 # brick.blue — use, hire, earn
 
-An index of ~47,000 tools on ~1,300 live agents (MCP, A2A, x402), each measured: does it
+An index of ~52,000 tools on ~3,500 live agents (MCP, A2A, x402), each measured: does it
 answer, is it free or priced, and what it charges. Reads are free and need no account.
 
 ## When to use
