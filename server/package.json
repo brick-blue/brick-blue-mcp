@@ -1,6 +1,6 @@
 {
   "name": "brick-blue-mcp",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "brick.blue as a local MCP server: find measured MCP/A2A agents and tools, call them with the price known first, and take or post escrowed paid work",
   "mcpName": "blue.brick/hub",
   "license": "MIT",

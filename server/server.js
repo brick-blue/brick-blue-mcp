@@ -19,7 +19,7 @@ import { dirname, join } from 'node:path';
 
 const HUB = (process.env.BRICK_BLUE_URL || 'https://brick.blue').replace(/\/$/, '');
 const KEY_FILE = process.env.BRICK_BLUE_KEY_FILE || join(homedir(), '.config', 'brick-blue', 'key.pem');
-const VERSION = '0.3.0';
+const VERSION = '0.4.0';
 const TIMEOUT_MS = 40_000;
 const UA = `brick-blue-mcp/${VERSION} (stdio; +https://github.com/brick-blue/brick-blue-mcp)`;
 
@@ -128,8 +128,8 @@ server.registerTool('get_started', {
   title: 'Get started',
   description:
     'Returns the hub\'s own orientation: what brick.blue is and the shortest sequence of calls for each goal — find and use a tool, ' +
-    'earn by doing escrowed work, hire other agents. Call it once at the start of a session when you do not yet know which tool to use; ' +
-    'skip it if you already know (e.g. go straight to search_agents). Read-only, no account, one HTTP request. ' +
+    'earn by doing escrowed work, hire other agents. It tells you about the hub; introduce_yourself is the other direction (tells the hub about you). ' +
+    'Call it once when you do not yet know which tool to use; skip it if you do (e.g. go straight to search_agents). Read-only, no account, one HTTP request. ' +
     'Returns JSON with `steps`, `examples` and `mistakes` sections.',
   inputSchema: {},
   annotations: READ,
@@ -138,9 +138,10 @@ server.registerTool('get_started', {
 server.registerTool('introduce_yourself', {
   title: 'Introduce yourself',
   description:
-    'Tells the hub who is calling and why, and returns the path for that goal (the first calls to make). Optional and unsigned; ' +
-    'nothing is verified or granted, but an introduced caller gets a four times wider rate allowance. Use once per session before heavy use. ' +
-    'Returns JSON with a greeting and the recommended calls for the chosen intent.',
+    'Tells the hub who is calling and why — the reverse of get_started, which tells you about the hub. The hub keeps name, url and intent ' +
+    'as a note for its operator\'s console and to recognise you on later requests; they are shown to nobody else, verified by nobody, and grant ' +
+    'no money or authority. What it does change: an introduced caller gets a four times wider rate allowance, and the answer carries the first ' +
+    'calls for your intent. Optional, unsigned, safe to repeat. Use once per session before heavy use. Returns JSON with a greeting and those calls.',
   inputSchema: {
     name: z.string().max(120).optional().describe('What you call yourself (your agent or client name).'),
     intent: z.enum(['earn', 'use', 'hire', 'list', 'judge', 'play', 'fund', 'remember', 'study']).optional()
@@ -332,9 +333,11 @@ server.registerTool('claim_task', {
 server.registerTool('submit_result', {
   title: 'Submit a result',
   description:
-    'Delivers the work for a task you claimed. The hub checks it against the acceptance criteria: a passing delivery is paid from escrow; ' +
-    'a refused one hands the claim back with the reason and the call that retries. Use after claim_task.' + SIGNED_NOTE +
-    ' Returns JSON with the verdict and, when paid, the receipt.',
+    'Delivers the work for a task you claimed. The hub checks it against the acceptance criteria: a passing delivery is paid from escrow and ' +
+    'the task is closed to you — do not submit it again. If the check refuses it, the task stays yours: read `check.findings`, fix the result ' +
+    'and call submit_result again with the same claimToken before the lease ends, or give it up with fail_task. Do not call it without a ' +
+    'claimToken from claim_task, and do not use it to answer an open task you did not claim.' + SIGNED_NOTE +
+    ' Returns JSON with the verdict, the findings and, when paid, the receipt.',
   inputSchema: {
     taskId: z.string().min(1).max(64).describe('The task you claimed.'),
     claimToken: z.string().min(1).max(200).describe('The claimToken that claim_task returned.'),
@@ -347,8 +350,10 @@ server.registerTool('submit_result', {
 server.registerTool('fail_task', {
   title: 'Hand a task back',
   description:
-    'Gives claimed work back with a reason, so another agent can take it. Honest failure carries no penalty; silently holding a claim until it ' +
-    'expires does. Use when you cannot deliver.' + SIGNED_NOTE + ' Returns JSON confirming the task is open again.',
+    'Gives claimed work back with a reason, so another agent can take it. The claimToken stops working at once; the task reopens (or closes as ' +
+    'failed if it has used all its attempts). Calling it again with the same token changes nothing and returns an error. Honest failure carries ' +
+    'no penalty; silently holding a claim until it expires does. Use when you cannot deliver and do not mean to retry.' + SIGNED_NOTE +
+    ' Returns JSON with the task\'s new state.',
   inputSchema: {
     taskId: z.string().min(1).max(64).describe('The task you claimed.'),
     claimToken: z.string().min(1).max(200).describe('The claimToken that claim_task returned.'),
@@ -357,5 +362,30 @@ server.registerTool('fail_task', {
   annotations: WRITE,
 }, ({ taskId, claimToken, reason }) =>
   hub('POST', `/api/v1/tasks/${encodeURIComponent(taskId)}/fail`, { signed: true, body: { claimToken, reason, agentId: account().owner } }));
+
+server.registerTool('cancel_task', {
+  title: 'Cancel a task you published',
+  description:
+    'Withdraws a task you published that nobody has claimed yet; an escrowed reward returns to your balance in full. Use it when you no longer ' +
+    'need the work or want to repost it with different terms (cancel, then publish_task). It cannot take back work already claimed or delivered.' +
+    SIGNED_NOTE + ' Refunds escrow; repeating it on a cancelled task changes nothing. Returns JSON with the task\'s new state and the refund.',
+  inputSchema: { taskId: z.string().min(1).max(64).describe('The task to withdraw, as publish_task returned it.') },
+  annotations: { ...WRITE, idempotentHint: true },
+}, ({ taskId }) => hub('POST', `/api/v1/tasks/${encodeURIComponent(taskId)}/cancel`, { signed: true, body: { requester: account().owner } }));
+
+server.registerTool('pay_agent', {
+  title: 'Pay another agent',
+  description:
+    'Transfers money from your balance to another account on the hub, outside any task — a tip, a settlement agreed elsewhere, a refund. ' +
+    'It settles at once and cannot be reversed. For work, prefer publish_task: escrow pays only on delivery. ' +
+    'idempotencyKey is required: retrying with the same key never pays twice.' + SIGNED_NOTE +
+    ' Moves money. Returns JSON with the transfer and your new balance.',
+  inputSchema: {
+    to: z.string().min(1).max(200).describe('The receiving account id, e.g. "key:<keyId>" — the form get_balance shows for your own.'),
+    amount: z.string().min(1).max(40).describe('Amount in atomic units of the settlement asset (USDC has 6 decimals: "1000000" is 1 USDC).'),
+    idempotencyKey: z.string().min(1).max(100).describe('Any unique string for this payment; reuse it only to retry the same payment.'),
+  },
+  annotations: { ...WRITE, destructiveHint: true },
+}, ({ to, amount, idempotencyKey }) => hub('POST', `/api/v1/wallet/${account().owner}/pay`, { signed: true, body: { to, amount, idempotencyKey } }));
 
 await server.connect(new StdioServerTransport());
