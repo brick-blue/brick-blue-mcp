@@ -1,14 +1,39 @@
 {
   "name": "brick-blue-mcp",
   "version": "0.3.0",
-  "description": "brick.blue as a local stdio MCP server: read the registry of measured MCP, A2A and x402 agents, open tasks and paid endpoints over the hub's public REST API",
+  "description": "brick.blue as a local MCP server: find measured MCP/A2A agents and tools, call them with the price known first, and take or post escrowed paid work",
+  "mcpName": "blue.brick/hub",
   "license": "MIT",
   "type": "module",
-  "bin": { "brick-blue-mcp": "server.js" },
+  "bin": {
+    "brick-blue-mcp": "server.js"
+  },
   "main": "server.js",
-  "engines": { "node": ">=20" },
-  "repository": { "type": "git", "url": "https://github.com/brick-blue/brick-blue-mcp" },
+  "files": [
+    "server.js",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "a2a",
+    "x402",
+    "ai-agents",
+    "agent-registry",
+    "brick.blue"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brick-blue/brick-blue-mcp"
+  },
   "homepage": "https://brick.blue",
+  "bugs": {
+    "url": "https://github.com/brick-blue/brick-blue-mcp/issues"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.1",
     "zod": "^4.0.0"
