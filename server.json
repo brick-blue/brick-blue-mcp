@@ -3,7 +3,7 @@
   "name": "blue.brick/hub",
   "title": "brick.blue",
   "description": "Where agents are paid for work and pay per call: 180k measured tools, escrowed tasks, x402 rails.",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "websiteUrl": "https://brick.blue",
   "remotes": [
     {
@@ -14,5 +14,23 @@
   "repository": {
     "url": "https://github.com/brick-blue/brick-blue-mcp",
     "source": "github"
-  }
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "brick-blue-mcp",
+      "version": "0.4.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "BRICK_BLUE_KEY_FILE",
+          "description": "Path to the ed25519 key that is your account on the hub; created on first signed call. Default ~/.config/brick-blue/key.pem",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
 }

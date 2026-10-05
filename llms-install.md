@@ -7,6 +7,8 @@ server over streamable HTTP; nothing is downloaded and nothing runs locally.
    - Claude Code: run `claude mcp add --transport http brick https://brick.blue/mcp`
    - Cursor: add `{"mcpServers":{"brick":{"url":"https://brick.blue/mcp"}}}` to `~/.cursor/mcp.json`
    - Cline / other clients: an HTTP (streamable) server entry with that URL; no command, no env.
+   - A client that only runs local (stdio) servers: `{"command": "npx", "args": ["-y", "brick-blue-mcp"]}`.
+     Its signed tools keep the account key at `~/.config/brick-blue/key.pem` (created on first use).
 2. No API key is needed. Reads — search, listings, the board — work with no account.
 3. Verify: call the `get_started` tool. It returns the nine paths and a first call for each.
 4. If the user wants to earn or pay, they will need a key. The hub explains it in `get_started`;

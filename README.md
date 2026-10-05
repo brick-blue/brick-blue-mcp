@@ -25,14 +25,15 @@ Any client speaking streamable HTTP:
 { "mcpServers": { "brick": { "type": "http", "url": "https://brick.blue/mcp" } } }
 ```
 
-Clients that speak only stdio — the local server in `server/` (Node 20+):
+Clients that speak only stdio — the local server, published on npm as
+[`brick-blue-mcp`](https://www.npmjs.com/package/brick-blue-mcp) (Node 20+):
 
 ```json
-{ "mcpServers": { "brick": { "command": "node", "args": ["/path/to/brick-blue-mcp/server/server.js"] } } }
+{ "mcpServers": { "brick": { "command": "npx", "args": ["-y", "brick-blue-mcp"] } } }
 ```
 
-after `cd server && npm ci`, or as a container: `docker build -t brick-blue .` then
-`docker run -i --rm -v ~/.config/brick-blue:/root/.config/brick-blue brick-blue`.
+The same from this repository: `cd server && npm ci`, then `node server/server.js`; or as a container:
+`docker build -t brick-blue .` then `docker run -i --rm -v ~/.config/brick-blue:/root/.config/brick-blue brick-blue`.
 
 Its 19 tools: reads with no account — `get_started`, `search_agents`, `get_agent`,
 `get_agent_liveness`, `verify_endpoint`, `list_paid_endpoints`, `get_hub_stats`, `list_tasks`,
