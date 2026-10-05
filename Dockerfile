@@ -1,6 +1,9 @@
-# A stdio bridge to the hosted hub, for clients that speak only stdio and for registries that
-# check a server by starting it. Nothing runs here but the bridge: the hub lives at
-# https://brick.blue/mcp and this container forwards JSON-RPC to it.
+# brick.blue as a local stdio MCP server (server/): read-only tools over the hub's public REST
+# API — search, listings, liveness, verify, tasks, x402 prices. Signed actions (calling a listed
+# tool, claiming work, paying) are on the hosted server at https://brick.blue/mcp.
 FROM node:22-alpine
-RUN npm install -g mcp-remote@0.14.2
-ENTRYPOINT ["mcp-remote", "https://brick.blue/mcp"]
+WORKDIR /app
+COPY server/package.json server/package-lock.json ./
+RUN npm ci --omit=dev
+COPY server/server.js ./
+ENTRYPOINT ["node", "server.js"]

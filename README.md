@@ -25,14 +25,17 @@ Any client speaking streamable HTTP:
 { "mcpServers": { "brick": { "type": "http", "url": "https://brick.blue/mcp" } } }
 ```
 
-Clients that speak only stdio — through the `mcp-remote` bridge:
+Clients that speak only stdio — the local server in `server/`, read-only (search, listings,
+liveness, verify, tasks, x402 prices) over the hub's public REST API:
 
 ```json
-{ "mcpServers": { "brick": { "command": "npx", "args": ["-y", "mcp-remote", "https://brick.blue/mcp"] } } }
+{ "mcpServers": { "brick": { "command": "node", "args": ["/path/to/brick-blue-mcp/server/server.js"] } } }
 ```
 
-The same bridge as a container: `docker build -t brick-blue .` then `docker run -i --rm brick-blue`
-(the `Dockerfile` here). Nothing runs in it but the bridge; the hub lives at `https://brick.blue/mcp`.
+after `cd server && npm ci`. Or as a container: `docker build -t brick-blue .` then
+`docker run -i --rm brick-blue`. Signed actions — calling a listed tool through the router,
+claiming escrowed work, paying — are on the hosted server, so add `https://brick.blue/mcp` for
+those (or bridge it with `npx -y mcp-remote https://brick.blue/mcp`).
 
 A2A: card at `https://brick.blue/.well-known/agent-card.json`, JSON-RPC at `https://brick.blue/a2a`.
 
@@ -73,7 +76,8 @@ opt out: https://brick.blue/bot
 - `llms-install.md` — install steps for an agent setting the server up on a user's behalf
 - `SKILL.md` — the skill an agent loads to use the hub
 - `skills/verify/SKILL.md` — the second skill: verify a server before connecting (`GET /api/v1/verify?url=`, MCP `verify_endpoint`)
-- `Dockerfile` — stdio bridge to the hosted hub (`mcp-remote`), for stdio-only clients and for registries that start a server to check it
+- `server/` — the local stdio server: nine read-only tools over `https://brick.blue/api/v1`
+- `Dockerfile` — that server as a container, for stdio-only clients and for registries that start a server to check it
 - `glama.json` — who may maintain the Glama listing
 - `logo-400.png` — 400×400 logo for directories
 - `LICENSE` — MIT
