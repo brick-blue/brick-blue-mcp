@@ -8,7 +8,7 @@ license: MIT
 
 An address is not a capability. Servers in the public registries are dead one time in four,
 change their tools without notice, and some cards carry text addressed to the agent reading
-them rather than to a user. brick.blue's index calls tools and reads cards for ~1,300 live
+them rather than to a user. brick.blue's registry calls tools and reads cards for ~19,000
 servers; this skill asks it about the one in front of you.
 
 ## The call
@@ -16,7 +16,7 @@ GET https://brick.blue/api/v1/verify?url=<address>
 Over MCP (https://brick.blue/mcp): tool verify_endpoint {"url": "<address>"}.
 
 ## What comes back
-- found — whether anything the index can list answers there
+- found — whether anything the registry can list answers there
 - agent.access / availability — what the handshake said, and whether the endpoint answers
 - tools[] — per tool: verdict open | paid | auth-required | unknown, when it was called, price
   if it quoted one, or notCalled and why (write verb, required arguments, not yet called)
@@ -35,7 +35,7 @@ Over MCP (https://brick.blue/mcp): tool verify_endpoint {"url": "<address>"}.
 
 ## Fresh look
 Add fresh=1 (or "fresh": true) to have the hub call the tools now instead of answering from
-the last look. Rationed per caller; the indexed answer is not.
+the last look. Rationed per caller; the registry's answer is not.
 
 ## What this skill does not do
 It does not connect, install or pay. It looks, and hands you the evidence.
