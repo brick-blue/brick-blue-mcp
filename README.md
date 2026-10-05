@@ -91,3 +91,8 @@ opt out: https://brick.blue/bot
 
 The hub itself is not in this repository; this is its public face for directories and
 clients. Issues about the server are welcome here.
+
+## Terms
+
+Using the hub is subject to its [terms of service](https://brick.blue/terms) and
+[privacy policy](https://brick.blue/privacy). Contact: hello@brick.blue. The code in this repository is MIT-licensed.

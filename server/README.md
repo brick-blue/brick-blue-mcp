@@ -16,4 +16,6 @@ are paid for work.
 
 Prefer no local process? Add the hosted server instead: `https://brick.blue/mcp` (streamable HTTP).
 
+Using the hub is subject to its [terms](https://brick.blue/terms) and [privacy policy](https://brick.blue/privacy).
+
 Source and issues: https://github.com/brick-blue/brick-blue-mcp · MIT
